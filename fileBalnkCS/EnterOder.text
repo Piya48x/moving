@@ -1,0 +1,139 @@
+// EnterOder.js
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import MapView, { Marker } from 'react-native-maps';
+import io from 'socket.io-client';
+
+const EnterOder = () => {
+  const [socket, setSocket] = useState(null);
+  const [driverLocation, setDriverLocation] = useState(null);
+  const [order, setOrder] = useState(null);
+  const route = useRoute();
+
+  useEffect(() => {
+    // Connect to the socket server
+    const newSocket = io('http://192.168.1.10:3000');
+    setSocket(newSocket);
+
+    return () => {
+      // Disconnect the socket when the component unmounts
+      newSocket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Listen for location updates from the server
+    if (socket) {
+      socket.on('locationUpdated', (location) => {
+        console.log('Received location update:', location);
+        setDriverLocation(location);
+      });
+
+      // Listen for new order events
+      socket.on('newOrder', (newOrder) => {
+        setOrder(newOrder);
+
+        // Display a notification for new orders
+        Alert.alert('New Order', `You have a new order: ${newOrder.pickupLocation}`);
+      });
+    }
+
+    return () => {
+      // Clean up event listeners when the component unmounts
+      if (socket) {
+        socket.off('locationUpdated');
+        socket.off('newOrder');
+      }
+    };
+  }, [socket]);
+
+  // Request device location and emit to the server
+  const handleUpdateLocation = async () => {
+    try {
+      // ... (Include your code to update the location)
+    } catch (error) {
+      console.error('Error getting location:', error);
+    }
+  };
+
+  const handleAcceptOrder = () => {
+    // Handle order acceptance logic, e.g., send a message to the server
+    socket.emit('acceptOrder', { orderId: order.id });
+
+    // Show an alert to notify the driver
+    Alert.alert('Order Accepted', 'You have accepted the order!');
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>Receive Order</Text>
+      <MapView
+        style={styles.map}
+        // Set the initial region based on driver's location
+        initialRegion={{
+          latitude: driverLocation?.latitude || 0,
+          longitude: driverLocation?.longitude || 0,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        {driverLocation && (
+          <Marker
+            coordinate={{
+              latitude: driverLocation.latitude,
+              longitude: driverLocation.longitude,
+            }}
+            title="Driver Location"
+          />
+        )}
+      </MapView>
+      {order ? (
+        <>
+          <Text style={styles.orderInfo}>{`New Order: ${order.pickupLocation}`}</Text>
+          <TouchableOpacity style={styles.acceptButton} onPress={handleAcceptOrder}>
+            <Text style={styles.buttonText}>Accept Order</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Text style={styles.orderInfo}>Waiting for orders...</Text>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 16,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  map: {
+    width: '100%',
+    height: 200,
+    marginBottom: 16,
+  },
+  orderInfo: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
+  acceptButton: {
+    backgroundColor: '#27ae60',
+    padding: 15,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+});
+
+export default EnterOder;

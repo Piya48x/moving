@@ -1,0 +1,94 @@
+// SendOrderScreen.js
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import io from 'socket.io-client';
+
+const SendOrderScreen = ({ navigation }) => {
+  const [socket, setSocket] = useState(null);
+
+  // Request permission for push notifications
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Notification permissions denied!');
+        }
+      } catch (error) {
+        console.error('Error requesting permission:', error);
+      }
+    })();
+  }, []);
+
+  const handleSendOrder = () => {
+    // Send an order to the server
+    if (socket) {
+      const orderData = { pickupLocation: 'Some Pickup Location' };
+      socket.emit('sendOrder', orderData);
+
+      // Send a local notification
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Order Sent',
+          body: 'Your order has been sent successfully!',
+        },
+        trigger: null,
+      });
+
+      // Navigate to the Greeting screen with order data
+      //navigation.navigate('EnterOder', { orderData });
+    }
+  };
+
+  useEffect(() => {
+    // Connect to the socket server
+    const newSocket = io('http://192.168.1.8:3000');
+    setSocket(newSocket);
+
+    return () => {
+      // Disconnect the socket when the component unmounts
+      newSocket.disconnect();
+    };
+  }, []);
+  
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>Send Order</Text>
+      <TouchableOpacity style={styles.sendOrderButton} onPress={handleSendOrder}>
+        <Text style={styles.buttonText}>Send Order</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  sendOrderButton: {
+    backgroundColor: '#3498db',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 8,
+    width: '80%',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+});
+
+export default SendOrderScreen;

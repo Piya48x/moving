@@ -1,0 +1,302 @@
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
+import MapView, { Marker, Polyline } from "react-native-maps";
+import * as Notifications from "expo-notifications";
+import io from 'socket.io-client';
+
+const apiKey = "AIzaSyAp5OleyH2H46AGS4kFoPvVu2SDZqCz5nc";
+
+const CustomerList = ({ route }) => {
+  const { pickupLocation, dropoffLocation } = route.params;
+  const [distance, setDistance] = useState(null);
+  const [polylineCoordinates, setPolylineCoordinates] = useState([]);
+  const [pickupAddress, setPickupAddress] = useState("กำลังโหลด...");
+  const [dropoffAddress, setDropoffAddress] = useState("กำลังโหลด...");
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const getLocationName = async (latitude, longitude, setAddressFunction) => {
+      try {
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+        );
+
+        const address = response?.data?.results[0]?.formatted_address;
+        if (address) {
+          setAddressFunction(address);
+        } else {
+          console.error("ไม่สามารถดึงข้อมูลที่อยู่ได้");
+        }
+      } catch (error) {
+        console.error("เกิดข้อผิดพลาดในการดึงข้อมูลที่อยู่:", error.message);
+      }
+    };
+
+    const calculateDistance = async () => {
+      try {
+        await getLocationName(
+          pickupLocation.latitude,
+          pickupLocation.longitude,
+          setPickupAddress
+        );
+        await getLocationName(
+          dropoffLocation.latitude,
+          dropoffLocation.longitude,
+          setDropoffAddress
+        );
+
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${pickupLocation.latitude},${pickupLocation.longitude}&destinations=${dropoffLocation.latitude},${dropoffLocation.longitude}&key=${apiKey}`
+        );
+
+        const distanceValue =
+          response?.data?.rows[0]?.elements[0]?.distance?.value;
+        if (distanceValue) {
+          const distanceInKm = distanceValue / 1000;
+          setDistance(distanceInKm);
+
+          // ดึงข้อมูลพิกัดและกำหนดค่าให้กับ polylineCoordinates
+          const polylineResponse = await axios.get(
+            `https://maps.googleapis.com/maps/api/directions/json?origin=${pickupLocation.latitude},${pickupLocation.longitude}&destination=${dropoffLocation.latitude},${dropoffLocation.longitude}&key=${apiKey}`
+          );
+
+          const points =
+            polylineResponse?.data?.routes[0]?.overview_polyline?.points;
+          if (points) {
+            const polylineCoords = decodePolyline(points);
+            setPolylineCoordinates(polylineCoords);
+          }
+        } else {
+          console.error("ไม่สามารถดึงข้อมูลระยะทางได้");
+        }
+      } catch (error) {
+        console.error("เกิดข้อผิดพลาดในการคำนวณระยะทาง:", error.message);
+      }
+    };
+
+    calculateDistance();
+  }, [pickupLocation, dropoffLocation, apiKey]);
+
+  const decodePolyline = (encoded) => {
+    let points = [];
+    let index = 0,
+      len = encoded.length;
+    let lat = 0,
+      lng = 0;
+
+    while (index < len) {
+      let b,
+        shift = 0,
+        result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+
+      let dlat = (result & 1) !== 0 ? ~(result >> 1) : result >> 1;
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+
+      let dlng = (result & 1) !== 0 ? ~(result >> 1) : result >> 1;
+      lng += dlng;
+
+      points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+    }
+
+    return points;
+  };
+
+  const calculateShippingCost = () => {
+    if (distance) {
+      const shippingCost = distance * 18;
+      return shippingCost.toFixed(2);
+    }
+    return "ไม่สามารถคำนวณราคาได้";
+  };
+
+  const totalCost = parseFloat(calculateShippingCost()).toFixed(2);
+
+  const callDispatchAPI = async () => {
+    try {
+      const response = await axios.post(
+        "YOUR_DISPATCH_API_ENDPOINT", // แทนที่ด้วยที่จริงของ API endpoint สำหรับ dispatch
+        {
+          pickupLocation,
+          dropoffLocation,
+          distance,
+          shippingCost: calculateShippingCost(),
+          totalCost,
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("เรียกใช้ API dispatch สำเร็จ");
+      } else {
+        console.error("เกิดข้อผิดพลาดในการเรียกใช้ API dispatch");
+      }
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการเรียกใช้ API:", error.message);
+    }
+  };
+
+  const socket = io("http://192.168.1.10:3000");  // แทนที่ YOUR_SOCKET_SERVER_URL ด้วย URL ของเซิร์ฟเวอร์ Socket.IO
+
+  const handleConfirmDelivery = () => {
+    // แจ้งให้คนขับทราบเกี่ยวกับคำสั่งซื้อ
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "คำสั่งซื้อใหม่",
+        body: "คุณมีคำสั่งส่งสินค้าใหม่!",
+      },
+      trigger: null,
+    });
+  
+    // ส่งข้อมูลไปยังหน้า EnterOrder ผ่าน Socket.IO
+    socket.emit("confirmDelivery", {
+      pickupLocation,
+      dropoffLocation,
+      distance,
+      shippingCost: calculateShippingCost(),
+      totalCost,
+      polylineCoordinates,
+    });
+  
+    // เรียกใช้ API dispatch
+    callDispatchAPI();
+  };
+  
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>สรุปคำสั่งซื้อ</Text>
+      <MapView
+        style={styles.map}
+        region={{
+          latitude: (pickupLocation.latitude + dropoffLocation.latitude) / 2,
+          longitude: (pickupLocation.longitude + dropoffLocation.longitude) / 2,
+          latitudeDelta:
+            Math.abs(pickupLocation.latitude - dropoffLocation.latitude) * 1.5,
+          longitudeDelta:
+            Math.abs(pickupLocation.longitude - dropoffLocation.longitude) *
+            1.5,
+        }}
+      >
+        {pickupLocation && (
+          <Marker coordinate={pickupLocation} title="ตำแหน่งรับสินค้า" />
+        )}
+        {dropoffLocation && (
+          <Marker coordinate={dropoffLocation} title="ตำแหน่งจัดส่ง" />
+        )}
+        {polylineCoordinates.length > 0 && (
+          <Polyline
+            coordinates={polylineCoordinates}
+            strokeColor="#3498db"
+            strokeWidth={3}
+          />
+        )}
+      </MapView>
+      <FlatList
+        data={[
+          {
+            label: "ตำแหน่งรับสินค้า : ",
+            value: pickupAddress,
+          },
+          {
+            label: "ตำแหน่งจัดส่ง : ",
+            value: dropoffAddress,
+          },
+          { label: "ระยะทาง", value: `${distance || "กำลังคำนวณ..."} กม.` },
+          {
+            label: "ค่าจัดส่ง",
+            value: `${calculateShippingCost().replace(
+              /\B(?=(\d{3})+(?!\d))/g,
+              ","
+            )} บาท`,
+          },
+        ]}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.itemContainer}>
+            <Text style={styles.label}>{item.label}</Text>
+            <Text style={styles.value}>{item.value}</Text>
+          </View>
+        )}
+      />
+      <Text style={styles.totalCost}>
+        รวมทั้งสิ้น: {totalCost.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} บาท
+      </Text>
+      <TouchableOpacity
+        style={styles.confirmButton}
+        onPress={handleConfirmDelivery}
+      >
+        <Text style={styles.buttonText}>ยืนยันการส่งสินค้า</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  map: {
+    flex: 1,
+    marginBottom: 16,
+    borderRadius: 10,
+  },
+  itemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  label: {
+    fontWeight: "bold",
+  },
+  value: {
+    flex: 1,
+    textAlign: "right",
+  },
+  totalCost: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  confirmButton: {
+    backgroundColor: "#0782F9",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 16,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
+    textAlign: "center",
+  },
+});
+
+export default CustomerList;

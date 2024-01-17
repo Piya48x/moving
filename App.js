@@ -2,13 +2,28 @@ import { StyleSheet, View, Text } from 'react-native'
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './src/Login';
-import Home1 from './src/Home1';
-import UserSelectionScreen from './src/UserSelectionScreen';
-import ServiceProviderScreen from './src/ServiceProviderScreen'
-import AssignScreen from './src/AssignScreen'
-import CustomerScreen from './src/CustomerScreen';
-
+import Login from './Login_Regis/Login';
+import UserSelectionScreen from './Service/UserSelectionScreen';
+import ServiceProviderScreen from './Service/ServiceProviderScreen'
+import AssignScreen from './Service/AssignScreen'
+import CustomerScreen from './Customer/CustomerScreen';
+import RegisterScreen from './Login_Regis/RegisterScreen';
+import CustomerList from './Customer/CustomerList';
+import ReceiveOrder from './tsetFlow/ReceiveOrder';
+import ReceiveOrderScreen from './Service/ReceiveOrderScreen';
+import EnterOder from './Service/EnterOder';
+import CallOder from './Customer/CallOder';
+import SummaryPage from './Service/SummaryPage';
+import Booking from './Customer/Booking';
+import DeliverySV from './Service/DeliverySV';
+import FollowDirver from './Customer/FollowDirver';
+import DeliveryCUS from './Customer/DeliveryCUS';
+import Onboarding from './Login_Regis/Onboarding';
+import AssignCustomer from './Customer/AssignCustomer';
+import CustomerProvider from './Customer/CustomerProvide';
+import BookingScreen from './Customer/BookingScreen';
+import TimeSelectionScreen from './Customer/TimeSelectionScreen';
+import UserSelectionCS from './Login_Regis/UserSelectionCS';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,14 +43,14 @@ const App = () => {
         
     >
         <Stack.Screen
+          name="Onboarding"
+          component={Onboarding}
+          options={{ headerShown: false }} // Hide the top bar // กำหนดชื่อของหน้า Login เป็น 'Login'
+        />
+        <Stack.Screen
           name="Login"
           component={Login}
           options={{ title: 'Login' }} // กำหนดชื่อของหน้า Login เป็น 'Login'
-        />
-        <Stack.Screen
-          name="Home1"
-          component={Home1}
-          options={{ title: 'Home' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
         />
         <Stack.Screen
           name="UserSelectionScreen"
@@ -57,10 +72,89 @@ const App = () => {
           component={CustomerScreen}
           options={{ title: 'Customer' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
         />
+        <Stack.Screen
+          name="RegisterScreen"
+          component={RegisterScreen}
+          options={{ title: 'Customer' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="CustomerList"
+          component={CustomerList}
+          options={{ title: 'Customer' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="ReceiveOrder"
+          component={ReceiveOrder}
+          options={{ title: 'Customer' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="ReceiveOrderScreen"
+          component={ReceiveOrderScreen}
+          options={{ title: 'Customer' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="EnterOrder"  // Make sure the name matches exactly
+          component={EnterOder}
+          options={{ title: 'Service' }}
+        />
+        <Stack.Screen
+          name="CallOder"
+          component={CallOder}
+          options={{ title: 'Customer' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="SummaryPage"
+          component={SummaryPage}
+          options={{ title: 'SummaryPage' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="Booking"
+          component={Booking}
+          options={{ title: 'Booking' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="DeliverySV"
+          component={DeliverySV}
+          options={{ headerShown: false }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="FollowDirver"
+          component={FollowDirver}
+          options={{ title: 'FollowDirver' }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="DeliveryCUS"
+          component={DeliveryCUS}
+          options={{ headerShown: false }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+        />
+        <Stack.Screen
+          name="AssignCustomer"
+          component={AssignCustomer}
+          options={{ title: 'AssignCustomer' }}
+        />
+        <Stack.Screen
+          name="CustomerProvider"
+          component={CustomerProvider}
+          options={{ title: 'CustomerProvider' }}
+        />
+        <Stack.Screen
+          name="BookingScreen"
+          component={BookingScreen}
+          options={{ title: 'BookingScreen' }}
+        />
+        <Stack.Screen
+          name="TimeSelectionScreen"
+          component={TimeSelectionScreen}
+          options={{ title: 'TimeSelectionScreen' }}
+        />
+        <Stack.Screen
+          name="UserSelectionCS"
+          component={UserSelectionCS}
+          options={{ title: 'UserSelectionCS' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   )
 }
-
 
 export default App;

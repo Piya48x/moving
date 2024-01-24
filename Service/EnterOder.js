@@ -479,34 +479,6 @@ const EnterOrder = () => {
                     onPress={() => {
                       handleCompleteOrder();
                     }}
-                    // onPress={() => {
-                    //   if (socket) {
-                    //     Alert.alert(
-                    //       `ยืนยันการจัดส่ง`,
-                    //       `คุณจัดส่งของหมายเลขออเดอร์ ${order.orderNumber} เสร็จเรียบร้อยแล้วใช่ไหม?`,
-                    //       [
-                    //         {
-                    //           text: "ยกเลิก",
-                    //           style: "cancel",
-                    //         },
-                    //         {
-                    //           text: "ใช่",
-                    //           onPress: () => {
-                    //             socket.emit("acceptOrder", {
-                    //               orderId: order.id,
-                    //             });
-                    //             navigation.navigate("DeliverySV", {
-                    //               //orderSummary: order,
-                    //             });
-                    //             // Clear the order data in the current screen
-                    //             setOrder(null);
-                    //             setIsOrderAccepted(true); // Update the state if needed
-                    //           },
-                    //         },
-                    //       ]
-                    //     );
-                    //   }
-                    // }}
                   >
                     <Text style={styles.buttonText}>เสร็จสิ้นการขนส่ง</Text>
                   </TouchableOpacity>

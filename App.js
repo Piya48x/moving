@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
@@ -28,10 +29,8 @@ import { Ionicons } from "@expo/vector-icons";
 import BookingHistoryScreen from "./Customer/Profiles/BookingHistoryScreen";
 import ProfileScreen from "./Customer/Profiles/ProfileScreen";
 import SettingsScreen from "./Customer/Profiles/SettingsScreen";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 
 
-const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 const App = () => {

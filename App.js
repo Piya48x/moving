@@ -1,4 +1,3 @@
-import 'react-native-gesture-handler';
 import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
@@ -7,7 +6,6 @@ import Login from "./Login_Regis/Login";
 import UserSelectionScreen from "./Service/UserSelectionScreen";
 import ServiceProviderScreen from "./Service/ServiceProviderScreen";
 import AssignScreen from "./Service/AssignScreen";
-import CustomerScreen from "./Customer/CustomerScreen";
 import RegisterScreen from "./Login_Regis/RegisterScreen";
 import CustomerList from "./Customer/CustomerList";
 import ReceiveOrder from "./tsetFlow/ReceiveOrder";
@@ -26,12 +24,17 @@ import BookingScreen from "./Customer/BookingScreen";
 import TimeSelectionScreen from "./Customer/TimeSelectionScreen";
 import UserSelectionCS from "./Login_Regis/UserSelectionCS";
 import { Ionicons } from "@expo/vector-icons";
-import BookingHistoryScreen from "./Customer/Profiles/BookingHistoryScreen";
-import ProfileScreen from "./Customer/Profiles/ProfileScreen";
-import SettingsScreen from "./Customer/Profiles/SettingsScreen";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { DrawerNavigationOptions } from "@react-navigation/drawer";
+import MainCustomer from "./Customer/MainCustomer";
+import DrawerContent from "./Customer/Profiles/DrawerContent";
 
 
+const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
+
+
+
 
 const App = () => {
   return (
@@ -55,12 +58,19 @@ const App = () => {
         <Stack.Screen
           name="Login"
           component={Login}
-          options={{ title: "Login" }} // กำหนดชื่อของหน้า Login เป็น 'Login'
+          options={{
+            title: "Login",
+            headerBackVisible: false, // This hides the back button
+          }}
         />
         <Stack.Screen
           name="UserSelectionScreen"
           component={UserSelectionScreen}
-          options={{ title: "Service" }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
+          // options={{ headerShown: false }}
+          options={{
+            title: "Service",
+            headerBackVisible: false, // This hides the back button
+          }}
         />
         <Stack.Screen
           name="ServiceProviderScreen"
@@ -73,22 +83,22 @@ const App = () => {
           options={{ title: "Service" }} // กำหนดชื่อของหน้า Home1 เป็น 'Home'
         />
         <Stack.Screen
-          name="CustomerScreen"
-          component={CustomerScreen}
-          
-          options={({ navigation }) => ({
-            title: "Customer",
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => {
-                  // ทำสิ่งที่คุณต้องการเมื่อคลิกที่ icon ตั้งค่า
-                }}
-                style={{ marginRight: 1 }}
-              >
-                <Ionicons name="menu" size={26} color="#fff" />
-              </TouchableOpacity>
-            ),
-          })}
+          name="MainCustomer"
+          component={MainCustomer}
+          options={{ headerShown: false }}
+          // options={({ navigation }) => ({
+          //   title: "Customer",
+          //   headerLeft: () => (
+          //     <TouchableOpacity
+          //       onPress={() => {
+          //         // ทำสิ่งที่คุณต้องการเมื่อคลิกที่ icon ตั้งค่า
+          //       }}
+          //       style={{ marginRight: 1 }}
+          //     >
+          //       <Ionicons name="menu" size={26} color="#fff" />
+          //     </TouchableOpacity>
+          //   ),
+          // })}
         />
         <Stack.Screen
           name="RegisterScreen"
@@ -171,19 +181,9 @@ const App = () => {
           options={{ title: "UserSelectionCS" }}
         />
         <Stack.Screen
-          name="BookingHistoryScreen"
-          component={BookingHistoryScreen}
-          options={{ title: "BookingHistoryScreen" }}
-        />
-        <Stack.Screen
-          name="ProfileScreen"
-          component={ProfileScreen}
-          options={{ title: "ProfileScreen" }}
-        />
-        <Stack.Screen
-          name="SettingsScreen"
-          component={SettingsScreen}
-          options={{ title: "SettingsScreen" }}
+          name="DrawerContent"
+          component={DrawerContent}
+          options={{ title: "DrawerContent" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

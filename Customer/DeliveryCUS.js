@@ -98,7 +98,7 @@ const DeliveryCUS = () => {
       <TouchableOpacity
         onPress={() => {
           // Animation has finished, navigate to another screen
-          navigation.navigate("CustomerScreen");
+          navigation.navigate("MainCustomer");
         }}
       >
         <View style={styles.completeButton}>

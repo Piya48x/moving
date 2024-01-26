@@ -25,7 +25,6 @@ import { useNavigation } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import "moment/locale/th";
-import { TextInput } from "react-native-paper";
 
 const CustomerScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -41,7 +40,6 @@ const CustomerScreen = ({ route }) => {
   //const { bookingType, selectedTime, reservationStatus } = route.params;
   const [reservationStatus, setReservationStatus] = useState(null);
 
-
   const mapRef = useRef(null);
 
   const [location, setLocation] = useState(null);
@@ -54,8 +52,6 @@ const CustomerScreen = ({ route }) => {
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-
-  
 
   useEffect(() => {
     moment.locale("th");
@@ -118,31 +114,29 @@ const CustomerScreen = ({ route }) => {
       <Text>{item}</Text>
     </TouchableHighlight>
   );
-  
 
   const reservationStatuses = ["ด่วน", "เหมาเต็มวัน"]; // Add more as needed
 
   const handleDateTimeSelection = () => {
     // Handle the selected date/time
     // console.log("Selected Date/Time:", selectedDateTime);
-  
+
     // Format the selected date and time
     const formattedDate = moment(selectedDate).format("LL");
     const formattedTime = moment(selectedTime).format("LT");
-  
+
     // Combine the date and time into a single string
     const combinedDateTime = `${formattedDate} เวลา: ${formattedTime}`;
-  
+
     // Check if the selected date and time are different from the existing state
     if (combinedDateTime !== selectedDateTime) {
       // Update the state variable with the selected date and time
       setSelectedDateTime(combinedDateTime);
     }
-  
+
     // Close the modal
     setDateTimeModalVisible(false);
   };
-  
 
   useEffect(() => {
     (async () => {
@@ -197,17 +191,17 @@ const CustomerScreen = ({ route }) => {
       Alert.alert("ข้อผิดพลาด", "กรุณาเลือกสถานที่รับและส่ง.");
       return;
     }
-  
+
     if (!selectedVehicleType) {
       Alert.alert("ข้อผิดพลาด", "กรุณาเลือกประเภทรถ.");
       return;
     }
-  
+
     if (!selectedDateTime) {
       Alert.alert("ข้อผิดพลาด", "กรุณาเลือกวันที่และเวลาการจอง.");
       return;
     }
-  
+
     navigation.navigate("CustomerList", {
       pickupLocation,
       dropoffLocation,
@@ -215,19 +209,17 @@ const CustomerScreen = ({ route }) => {
       reservationStatus,
       selectedDateTime, // Pass selectedDateTime here
     });
-  
+
     // Reset state
     setPickupLocation(null);
     setDropoffLocation(null);
     setSelectedVehicleType(null);
     setSelectedDateTime(null); // Reset selectedDateTime
-  
+
     // Clear GooglePlacesAutocomplete fields
     pickupAutocompleteRef.current.clear();
     dropoffAutocompleteRef.current.clear();
   };
-  
-  
 
   const clearPickupLocation = () => {
     setPickupLocation(null);
@@ -490,12 +482,12 @@ const CustomerScreen = ({ route }) => {
             keyExtractor={(item) => item}
           />
           <Text style={styles.text1}>
-          คุณสามารถกำหนดวันที่และเวลาที่ต้องการขนส่งได้
-        </Text>
-          <Text style={styles.text}>
-            วันที่: {moment(selectedDate).format("LL")} และ เวลา: {moment(selectedTime).format("LT")}
+            คุณสามารถกำหนดวันที่และเวลาที่ต้องการขนส่งได้
           </Text>
-      
+          <Text style={styles.text}>
+            วันที่: {moment(selectedDate).format("LL")} และ เวลา:{" "}
+            {moment(selectedTime).format("LT")}
+          </Text>
 
           {/* <TouchableOpacity
             style={styles.vehicleTypeButton}
@@ -504,22 +496,18 @@ const CustomerScreen = ({ route }) => {
             <Text style={styles.buttonText}>กดเพื่อเลือกวันที่</Text>
           </TouchableOpacity> */}
 
-          <TouchableOpacity
-            style={styles.vehicleTypeButton1}
-          >
+          <TouchableOpacity style={styles.vehicleTypeButton1}>
             <DateTimePicker
-            style={{marginLeft: -30}}
+              style={{ marginLeft: -30 }}
               value={selectedDate}
               mode="date"
               onChange={handleDateChange}
               locale="th"
             />
-       </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.vehicleTypeButton1}
-          >
-             <DateTimePicker
-             style={{marginLeft: -10}}
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.vehicleTypeButton1}>
+            <DateTimePicker
+              style={{ marginLeft: -10 }}
               value={selectedTime}
               mode="time"
               is24Hour={true}
@@ -527,10 +515,6 @@ const CustomerScreen = ({ route }) => {
               locale="th"
             />
           </TouchableOpacity>
-
-         
-           
-        
 
           <TouchableHighlight onPress={handleDateTimeSelection}>
             <Text style={styles.modalCloseButton}>ยืนยัน</Text>
@@ -586,7 +570,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#00bfff",
     padding: 15,
     borderRadius: 10,
-    marginTop: 20
+    marginTop: 20,
   },
   map: {
     flex: 1,
@@ -641,12 +625,10 @@ const styles = StyleSheet.create({
   },
   text1: {
     color: "#333",
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 18,
-    paddingBottom: 30
+    paddingBottom: 30,
   },
 });
-
-
 
 export default CustomerScreen;

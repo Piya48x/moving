@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#ffffff",
     padding: 16,
+    marginTop: -250
   },
   title: {
     fontSize: 24,
@@ -145,6 +146,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "100%",
+   
   },
   input: {
     height: 40,

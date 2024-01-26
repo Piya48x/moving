@@ -28,7 +28,7 @@ const UserSelectionScreen = () => {
 
   const handleCustomerPress = () => {
     // นำทางไปยังหน้าลูกค้าทั่วไป
-    navigation.navigate('CustomerScreen');
+    navigation.navigate('MainCustomer');
   };
   // const handleCustomerPress = () => {
   //   // นำทางไปยังหน้าลูกค้าทั่วไป
@@ -52,7 +52,7 @@ const UserSelectionScreen = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Animatable.Text animation="fadeInDown" duration={1500} delay={500}>
-          <Text style={styles.headerText}>เลือกบริการของคุณ?</Text>
+          <Text style={styles.headerText}>โปรดเลือกสถานะของคุณ?</Text>
         </Animatable.Text>
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
@@ -87,14 +87,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f5f5f5",
+    marginTop: 20
   },
   headerText: {
     fontSize: 24,
-    marginBottom: 20,
   },
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "center", // จัดวางปุ่มตรงกลาง
+    marginTop: 70
   },
   button: {
     backgroundColor: "#0782F9",

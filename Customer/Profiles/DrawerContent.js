@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Avatar, Title } from "react-native-paper";
@@ -44,6 +44,8 @@ const DrawerItems = (props) => {
 };
 function DrawerContent(props) {
   const navigation = useNavigation();
+  const [userName, setUserName] = useState("");
+  
   const handleLogout = async () => {
     try {
       await signOut(auth); // ทำการออกจากระบบ
@@ -54,8 +56,24 @@ function DrawerContent(props) {
       console.error("Logout error:", error); // พิมพ์ข้อผิดพลาด (ถ้ามี)
     }
   };
-  // Access the currently authenticated user
+ 
+  const fetchUserProfileData = async () => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      setUserName(currentUser.displayName || "DefaultUsername");
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfileData();
+  }, []);
+
+  useEffect(() => {
+    fetchUserProfileData();
+  }, []);
+  
   const currentUser = auth.currentUser;
+
   return (
     <View style={{ flex: 1 }}>
       <DrawerContentScrollView {...props}>
@@ -64,16 +82,14 @@ function DrawerContent(props) {
             <View style={styles.userInfoSection}>
               <View style={{ flexDirection: "row", marginTop: 15 }}>
                 <Avatar.Image
-                  source={{
-                    uri: "../../assets/adaptive-icon.png",
-                  }}
+                  source={require("../../image/a.jpg")}
                   size={50}
                   style={{ marginTop: 5 }}
                 />
                 <View style={{ marginLeft: 10, flexDirection: "column" }}>
-                  <Title style={styles.title}>Piya</Title>
+                <Title style={styles.title}>{userName}</Title>
                   <Text style={styles.caption} numberOfLines={1}>
-                  {currentUser.email}
+                    {currentUser.email}
                   </Text>
                 </View>
               </View>

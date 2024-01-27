@@ -39,14 +39,14 @@ const UserSelectionScreen = () => {
   //   navigation.navigate('CallOder');
   // };
 
-  const handleServiceProviderPress = () => {
-    // นำทางไปยังหน้าผู้ให้บริการ
-    navigation.navigate('EnterOrder');
-  };
   // const handleServiceProviderPress = () => {
   //   // นำทางไปยังหน้าผู้ให้บริการ
-  //   navigation.navigate("ServiceProviderScreen");
+  //   navigation.navigate('EnterOrder');
   // };
+  const handleServiceProviderPress = () => {
+    // นำทางไปยังหน้าผู้ให้บริการ
+    navigation.navigate("RegisterScreen");
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>

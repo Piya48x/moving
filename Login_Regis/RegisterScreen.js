@@ -7,15 +7,17 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
+
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userName, setUserName] = useState(""); // New state for username
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigation = useNavigation();
@@ -35,16 +37,21 @@ const RegisterScreen = () => {
       email,
       password,
       confirmPassword,
+      userName, // Include username in the log
     });
-    if (email && password && confirmPassword) {
+    if (email && password && confirmPassword && userName) {
       try {
         await createUserWithEmailAndPassword(
           auth,
           email,
           password,
-          confirmPassword
+          confirmPassword,
+          userName,
         );
         const user = auth.currentUser;
+        await updateProfile(user, { displayName: userName });
+  
+
         console.log("Registered with: ", user.email);
         console.log("Register successful");
         alert("สมัครสมาชิกเสร็จสมบูณ์แล้ว");
@@ -55,7 +62,7 @@ const RegisterScreen = () => {
         alert("อีเมลนี้ถูกใช้งานแล้ว!");
       }
     } else {
-      alert("กรุณากรอกอีเมล, รหัสผ่าน และยืนยันรหัสผ่าน");
+      alert("กรุณากรอกอีเมล, รหัสผ่าน, ยืนยันรหัสผ่าน และชื่อผู้ใช้");
     }
   };
 
@@ -63,6 +70,20 @@ const RegisterScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Register</Text>
       <View style={styles.formContainer}>
+      <View style={styles.inputContainer}>
+        <Feather
+          name="user"
+          size={24}
+          color="black"
+          style={styles.inputIcon}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={userName}
+          onChangeText={setUserName}
+        />
+      </View>
         <View style={styles.inputContainer}>
           <Feather
             name="mail"
